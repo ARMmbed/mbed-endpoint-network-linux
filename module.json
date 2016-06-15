@@ -1,0 +1,9 @@
+{
+  "name": "mbed-endpoint-network-linux",
+  "version": "0.0.1",
+  "description": "mbedEndpointNetwork stubs for linux",
+  "keywords": [],
+  "author": "Doug Anson doug.anson@arm.com",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}
