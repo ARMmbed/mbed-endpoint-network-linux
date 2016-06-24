@@ -56,13 +56,20 @@ static void ctrl_c_handle_function(void)
     }
 }
 
+void wait_for_registration(Connector::Endpoint *ep) {
+    while(ep->isRegistered() == false) {
+	sleep(1);
+    }
+}
+
 // wait for deregistration to occur
 void *wait_for_deregistration(void* arg) 
 {
      Connector::Endpoint *ep = (Connector::Endpoint *)arg;
+     wait_for_registration(ep);
      while(ep->isRegistered() == true) {
-	sleep(5);
-     }
+	sleep(1);
+     }     
      logger.log("De-registration completed. Killing Threads...");
      pthread_detach(registration_update_thread);
      pthread_detach(deregistration_thread);
@@ -75,6 +82,7 @@ void *wait_for_deregistration(void* arg)
 void *update_registration(void* arg) 
 {
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
+    wait_for_registration(ep);
     while(loop) {
         sleep(30);
         ep->re_register_endpoint();
