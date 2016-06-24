@@ -51,28 +51,25 @@ extern "C" {
 
 // Linux Handlers
 static void ctrl_c_handle_function(void) {
-    if (p != NULL) {
-        Connector::Endpoint *ep = (Connector::Endpoint *)p;
+    if (_my_endpoint != NULL) {
+        Connector::Endpoint *ep = (Connector::Endpoint *)_my_endpoint;
         ep->de_register_endpoint();
     }
     exit(1);
 }
 
 void* wait_for_unregister(void* arg) {
-    // connected
-    if (p != NULL) {
-        Connector::Endpoint *ep = (Connector::Endpoint *)p;
-        if(ep->isRegistered() == false) {
-             printf("Unregistered done\n");
-             pthread_detach(update_register_thread);
-             pthread_detach(observation_thread);
-             pthread_detach(unregister_thread);
-             loop = false; 
-             pthread_cancel(update_register_thread);
-             pthread_cancel(observation_thread);
-             pthread_cancel(unregister_thread);
-	}
-    }
+     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
+     if(ep->isRegistered() == false) {
+         printf("Unregistered done\n");
+         pthread_detach(update_register_thread);
+         pthread_detach(observation_thread);
+         pthread_detach(unregister_thread);
+         loop = false; 
+         pthread_cancel(update_register_thread);
+         pthread_cancel(observation_thread);
+        pthread_cancel(unregister_thread);
+     }
     return NULL;
 }
 
