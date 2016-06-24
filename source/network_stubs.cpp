@@ -40,6 +40,9 @@ static void *_my_endpoint = NULL;
 
 extern "C" {
 
+// forward reference of main() entry point
+extern void app_start(int argc,char *argv[]);
+
 pthread_t unregister_thread;
 pthread_t observation_thread;
 pthread_t update_register_thread;
@@ -131,4 +134,7 @@ void net_setup_deregistration_button(void *p) {
     signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
 }
 
+// main()
+int main(int argc,char *argv[]) {
+    app_start(argc,argv);	
 }
