@@ -34,9 +34,6 @@ extern "C" {
 
 // plumb out the network
 void net_plumb_network(void *p)   {
-     // Debug
-     logger.log("mbedEndpointNetwork(Linux): IP Address: %s",ethernet.getIPAddress());
-     
     // save 
     _my_endpoint = p;
     
