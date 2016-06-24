@@ -1,6 +1,6 @@
 {
   "name": "mbed-endpoint-network-linux",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "mbedEndpointNetwork stubs for linux",
   "keywords": [],
   "author": "Doug Anson doug.anson@arm.com",

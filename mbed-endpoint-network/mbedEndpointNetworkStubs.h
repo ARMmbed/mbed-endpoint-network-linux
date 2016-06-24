@@ -26,17 +26,7 @@
 // Connector Endpoint
 #include "mbed-connector-interface/ConnectorEndpoint.h"
 
-// Ethernet Interface with Minar Scheduling
-#include "EthernetInterface.h"
-#include "sockets/UDPSocket.h"
-
-// Minar support
-#include "minar/minar.h"
-
-// IPv4 support
-#include "lwipv4_init.h"
- 
- // DEBUG
+// DEBUG
 #ifndef NDEBUG
 #define DEBUG_OUT(...) { printf(__VA_ARGS__); }
 #else
