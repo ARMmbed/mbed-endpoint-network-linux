@@ -55,19 +55,22 @@ static void ctrl_c_handle_function(void) {
     exit(1);
 }
 
+// wait for deregistratino to occur
 void* wait_for_unregister(void* arg) {
+     sleep(30);
      Connector::Endpoint *ep = (Connector::Endpoint *)arg;
-     if(ep->isRegistered() == false) {
-         printf("Unregistered done\n");
-         pthread_detach(update_register_thread);
-         pthread_detach(observation_thread);
-         pthread_detach(unregister_thread);
-         loop = false; 
-         pthread_cancel(update_register_thread);
-         pthread_cancel(observation_thread);
-        pthread_cancel(unregister_thread);
+     while(ep->isRegistered() == true) {
+	sleep(5);
      }
-    return NULL;
+     logger.log("De-registration completed. Killing Threads...");
+     pthread_detach(update_register_thread);
+     pthread_detach(observation_thread);
+     pthread_detach(unregister_thread);
+     pthread_cancel(update_register_thread);
+     pthread_cancel(observation_thread);
+     pthread_cancel(unregister_thread);
+     loop = false; 
+     return NULL;
 }
 
 void *update_registration(void* arg) {
@@ -82,9 +85,7 @@ void *update_registration(void* arg) {
 
 void *register_endpoint(void *arg) {
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
-    if (ep->isRegistered() == false) {
-        ep->register_endpoint(ep->getEndpointSecurity(),ep->getEndpointObjectList());
-    }
+    ep->register_endpoint(ep->getEndpointSecurity(),ep->getEndpointObjectList());
 }
 
 // plumb out the network
@@ -102,7 +103,7 @@ void net_plumb_network(void *p)   {
 // perform the endpoint registration
 void net_perform_endpoint_registration(Connector::Endpoint *endpoint) 
 {
-    pthread_create(&observation_thread, NULL, &register_endpoint,(void *)endpoint);
+    pthread_create(&observation_thread,NULL,&register_endpoint,(void *)endpoint);
 }
 
 // create a suitable main event loop for this specific network
@@ -121,13 +122,17 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
     pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
 
     // enter main loop
-    while(loop);
+    while(loop) {
+	sleep(5);
+    }
+    logger.log("Application exiting...");
+    exit(0);
 }
 
 // setup shutdown button
 void net_setup_deregistration_button(void *p) {
     // set signal handler for ctrl-c
-    signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
+    signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
 }
 
 // main()
@@ -136,7 +141,6 @@ int main(int argc,char *argv[]) {
 }
 
 void NVIC_SystemReset() {
-    exit(1);
 }
 
 }
