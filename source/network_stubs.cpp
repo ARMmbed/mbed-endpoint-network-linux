@@ -38,7 +38,6 @@ extern void app_start(int argc,char *argv[]);
 extern "C" {
 
 pthread_t unregister_thread;
-pthread_t observation_thread;
 pthread_t update_register_thread;
 
 // main loop
@@ -64,10 +63,8 @@ void* wait_for_unregister(void* arg) {
      }
      logger.log("De-registration completed. Killing Threads...");
      pthread_detach(update_register_thread);
-     pthread_detach(observation_thread);
      pthread_detach(unregister_thread);
      pthread_cancel(update_register_thread);
-     pthread_cancel(observation_thread);
      pthread_cancel(unregister_thread);
      loop = false; 
      return NULL;
@@ -85,7 +82,6 @@ void *update_registration(void* arg) {
 
 
 void *register_endpoint(void *arg) {
-    sleep(10);
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
     if (ep != NULL) {
 	logger.log("mbedEndpointNetwork(Linux): registering endpoint...");
@@ -109,8 +105,7 @@ void net_plumb_network(void *p)   {
 void net_perform_endpoint_registration(Connector::Endpoint *endpoint) 
 {
     // register the endpoint
-    logger.log("mbedEndpointNetwork(Linux): endpoint creating registration thread...");
-    pthread_create(&observation_thread,NULL,&register_endpoint,(void *)endpoint);
+    register_endpoint((void *)endpoint);
 }
 
 // create a suitable main event loop for this specific network
