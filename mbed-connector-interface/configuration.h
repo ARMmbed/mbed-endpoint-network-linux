@@ -46,9 +46,6 @@
  // YOTTA
  #define MCI_USE_YOTTA                                  true
 
- // Use early registration of shutdown button
- #define ENDPOINT_EARLY_CONFIG_DEREG_BUTTON             true
-
  // Yotta implements ExecuteParams
  #define HAS_EXECUTE_PARAMS                             true
 
