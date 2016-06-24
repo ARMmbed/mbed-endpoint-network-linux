@@ -85,6 +85,7 @@ void *update_registration(void* arg) {
 
 
 void *register_endpoint(void *arg) {
+    sleep(10);
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
     if (ep != NULL) {
 	logger.log("mbedEndpointNetwork(Linux): registering endpoint...");
