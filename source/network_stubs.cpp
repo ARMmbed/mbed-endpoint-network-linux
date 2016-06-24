@@ -20,7 +20,15 @@
  * limitations under the License.
  */
 
-// Includes...
+// Linux Includes
+#include <unistd.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <signal.h> /* For SIGIGN and SIGINT */
+
+// mbed Includes
 #include "mbed-endpoint-network/mbedEndpointNetworkStubs.h"
 
 // Logger
@@ -30,13 +38,66 @@ extern Logger logger;
 // endpoint pointer
 static void *_my_endpoint = NULL;
 
+static void ctrl_c_handle_function(void);
+typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
+
+pthread_t unregister_thread;
+pthread_t observation_thread;
+pthread_t update_register_thread;
+extern volatile bool loop;
+
 extern "C" {
+
+
+// Linux Handlers
+static void ctrl_c_handle_function(void) {
+    if (p != NULL) {
+        Connector::Endpoint *ep = (Connector::Endpoint *)p;
+        ep->de_register_endpoint();
+    }
+    exit(1);
+}
+
+void* wait_for_unregister(void* arg) {
+    // connected
+    if (p != NULL) {
+        Connector::Endpoint *ep = (Connector::Endpoint *)p;
+        if(ep->isRegistered() == false) {
+             printf("Unregistered done\n");
+             pthread_detach(update_register_thread);
+             pthread_detach(observation_thread);
+             pthread_detach(unregister_thread);
+             loop = false; 
+             pthread_cancel(update_register_thread);
+             pthread_cancel(observation_thread);
+             pthread_cancel(unregister_thread);
+	}
+    }
+    return NULL;
+}
+
+void *update_registration(void* arg) {
+    Connector::Endpoint *ep = (Connector::Endpoint *)arg;
+    while(1) {
+        sleep(30);
+        ep->re_register_endpoint();
+    }
+    return NULL;
+}
+
+
+void *register_endpoint(void *arg) {
+    Connector::Endpoint *ep = (Connector::Endpoint *)arg;
+    if (ep->isRegistered() == false) {
+        ep->register_endpoint(ep->getEndpointSecurity(),ep->getEndpointObjectList());
+    }
+}
 
 // plumb out the network
 void net_plumb_network(void *p)   {
     // save 
     _my_endpoint = p;
-    
+
     // connected
     if (p != NULL) {
 	Connector::Endpoint *ep = (Connector::Endpoint *)p;
@@ -47,15 +108,14 @@ void net_plumb_network(void *p)   {
 // perform the endpoint registration
 void net_perform_endpoint_registration(Connector::Endpoint *endpoint) 
 {
-   	mbed::util::FunctionPointer2<void, M2MSecurity*, M2MObjectList> fp(endpoint, &Connector::Endpoint::register_endpoint);
-        minar::Scheduler::postCallback(fp.bind(endpoint->getEndpointSecurity(),endpoint->getEndpointObjectList()));
+    pthread_create(&observation_thread, NULL, &register_endpoint,(void *)endpoint);
 }
 
 // create a suitable main event loop for this specific network
 void net_create_main_loop(Connector::Endpoint * /*endpoint */)
 {
-	// nothing to create - create and dispatch will occur in begin_main_loop() below
-	;
+     // nothing to create - create and dispatch will occur in begin_main_loop() below
+     ;
 }
 
 // begin the main loop for processing network events
@@ -63,12 +123,14 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
 {
     // Initialize our main loop...
     logger.log("mbedEndpointNetwork(Linux): Starting main loop...");
-    Connector::Options *options = endpoint->getOptions();
-    minar::Scheduler::postCallback(endpoint,&Connector::Endpoint::re_register_endpoint).period(minar::milliseconds(options->getRegUpdatePeriod()));
+    pthread_create(&update_register_thread,NULL,&update_registration,(void *)endpoint);
+    pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
 }
 
 // setup shutdown button
 void net_setup_deregistration_button(void *p) {
+    // set signal handler for ctrl-c
+    signal(SIGINT, (signalhandler_t)ctrl_c_handle_function);
 }
 
 }
