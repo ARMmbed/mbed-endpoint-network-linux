@@ -59,7 +59,6 @@ static void ctrl_c_handle_function(void)
 // wait for deregistration to occur
 void *wait_for_deregistration(void* arg) 
 {
-     sleep(30);
      Connector::Endpoint *ep = (Connector::Endpoint *)arg;
      while(ep->isRegistered() == true) {
 	sleep(5);
@@ -75,7 +74,6 @@ void *wait_for_deregistration(void* arg)
 
 void *update_registration(void* arg) 
 {
-    sleep(30);
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
     while(loop) {
         sleep(30);
@@ -106,13 +104,6 @@ void net_plumb_network(void *p)   {
     }
 }
 
-// perform the endpoint registration
-void net_perform_endpoint_registration(Connector::Endpoint *endpoint) 
-{
-    // register the endpoint
-    register_endpoint((void *)endpoint);
-}
-
 // create a suitable main event loop for this specific network
 void net_create_main_loop(Connector::Endpoint *endpoint)
 {
@@ -141,6 +132,19 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
     }
     logger.log("mbedEndpointNetwork(Linux): endpoint exiting...");
     exit(0);
+}
+
+// perform the endpoint registration
+void net_perform_endpoint_registration(Connector::Endpoint *endpoint)
+{
+    // register the endpoint
+    register_endpoint((void *)endpoint);
+
+    // create the main loop
+    net_create_main_loop((void *)endpoint);
+
+    // start the main loop
+    net_begin_main_loop((void *)endpoint);
 }
 
 // setup shutdown button
