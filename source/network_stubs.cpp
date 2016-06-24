@@ -20,22 +20,13 @@
  * limitations under the License.
  */
 
-// Linux Includes
-#include <unistd.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-#include <signal.h> /* For SIGIGN and SIGINT */
-
 // mbed Includes
 #include "mbed-endpoint-network/mbedEndpointNetworkStubs.h"
 
 // Logger
-#include "mbed-connector-interface/Logger.h"
 extern Logger logger;
 
-// endpoint pointer
+// endpoint instance
 static void *_my_endpoint = NULL;
 
 // forward reference of main() entry point
