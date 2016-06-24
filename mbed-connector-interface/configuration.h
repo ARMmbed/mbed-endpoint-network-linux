@@ -40,15 +40,6 @@
  #define NSP_DOMAIN_LENGTH        			128
  #define NSP_DOMAIN              			"domain"
  
- // Server Certificate Max Length
- #define MAX_SERVER_CERT_LENGTH				768
- 
- // Client Certificate Max Length
- #define MAX_CLIENT_CERT_LENGTH				768
- 
- // Client Key Max Length
- #define MAX_CLIENT_KEY_LENGTH				256
-
  // Minar Scheduling
  #define MCI_MINAR_SCHEDULER				true
  
