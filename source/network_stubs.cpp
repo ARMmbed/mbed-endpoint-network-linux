@@ -38,10 +38,10 @@ extern Logger logger;
 // endpoint pointer
 static void *_my_endpoint = NULL;
 
-extern "C" {
-
 // forward reference of main() entry point
 extern void app_start(int argc,char *argv[]);
+
+extern "C" {
 
 pthread_t unregister_thread;
 pthread_t observation_thread;
@@ -137,6 +137,10 @@ void net_setup_deregistration_button(void *p) {
 // main()
 int main(int argc,char *argv[]) {
     app_start(argc,argv);	
+}
+
+void NVIC_SystemReset() {
+    exit(1);
 }
 
 }
