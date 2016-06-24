@@ -34,9 +34,6 @@ extern "C" {
 
 // plumb out the network
 void net_plumb_network(void *p)   {
-     // LWIP initialize
-     lwipv4_socket_init(); 
-    
      // Debug
      logger.log("mbedEndpointNetwork(Linux): IP Address: %s",ethernet.getIPAddress());
      
