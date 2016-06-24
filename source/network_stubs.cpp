@@ -40,7 +40,9 @@ extern "C" {
 pthread_t unregister_thread;
 pthread_t observation_thread;
 pthread_t update_register_thread;
-volatile bool loop;
+
+// main loop
+volatile bool loop = true;
 
 typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 
