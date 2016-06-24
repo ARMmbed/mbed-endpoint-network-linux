@@ -119,7 +119,7 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
     // Initialize our main loop...
     logger.log("mbedEndpointNetwork(Linux): Starting main loop...");
     pthread_create(&update_register_thread,NULL,&update_registration,(void *)endpoint);
-    pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
+    // pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
 
     // enter main loop
     while(1) {
