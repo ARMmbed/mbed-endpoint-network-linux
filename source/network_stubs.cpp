@@ -122,7 +122,7 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
     pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
 
     // enter main loop
-    while(loop) {
+    while(1) {
 	sleep(5);
     }
     logger.log("Application exiting...");
