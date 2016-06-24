@@ -23,6 +23,9 @@
 // mbed Includes
 #include "mbed-endpoint-network/mbedEndpointNetworkStubs.h"
 
+// SIGNAL support
+#include <signal.h> /* For SIGIGN and SIGINT */
+
 // Logger
 extern Logger logger;
 
