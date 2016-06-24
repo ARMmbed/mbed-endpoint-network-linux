@@ -86,7 +86,10 @@ void *update_registration(void* arg) {
 
 void *register_endpoint(void *arg) {
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
-    ep->register_endpoint(ep->getEndpointSecurity(),ep->getEndpointObjectList());
+    if (ep != NULL) {
+	logger.log("mbedEndpointNetwork(Linux): registering endpoint...");
+        ep->register_endpoint(ep->getEndpointSecurity(),ep->getEndpointObjectList());
+    }
 }
 
 // plumb out the network
@@ -104,36 +107,43 @@ void net_plumb_network(void *p)   {
 // perform the endpoint registration
 void net_perform_endpoint_registration(Connector::Endpoint *endpoint) 
 {
+    // register the endpoint
+    logger.log("mbedEndpointNetwork(Linux): endpoint creating registration thread...");
     pthread_create(&observation_thread,NULL,&register_endpoint,(void *)endpoint);
 }
 
 // create a suitable main event loop for this specific network
 void net_create_main_loop(Connector::Endpoint * /*endpoint */)
 {
-     // nothing to create - create and dispatch will occur in begin_main_loop() below
-     ;
+     // create the registration update thread...
+     logger.log("mbedEndpointNetwork(Linux): endpoint creating re-registration thread...");
+     pthread_create(&update_register_thread,NULL,&update_registration,(void *)endpoint);
+
+     // create the unregistration thread...
+     logger.log("mbedEndpointNetwork(Linux): endpoint creating de-registration thread...");
+     pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
 }
 
 // begin the main loop for processing network events
 void net_begin_main_loop(Connector::Endpoint *endpoint)
 {
     // Initialize our main loop...
-    logger.log("mbedEndpointNetwork(Linux): Starting main loop...");
-    pthread_create(&update_register_thread,NULL,&update_registration,(void *)endpoint);
-    // pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
+    logger.log("mbedEndpointNetwork(Linux): Setting CTRL-C handler...");
+
+    // set signal handler for ctrl-c
+    signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
 
     // enter main loop
-    while(1) {
+    logger.log("mbedEndpointNetwork(Linux): endpoint starting main loop...");
+    while(loop) {
 	sleep(5);
     }
-    logger.log("Application exiting...");
+    logger.log("mbedEndpointNetwork(Linux): endpoint exiting...");
     exit(0);
 }
 
 // setup shutdown button
 void net_setup_deregistration_button(void *p) {
-    // set signal handler for ctrl-c
-    //signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
 }
 
 // main()
