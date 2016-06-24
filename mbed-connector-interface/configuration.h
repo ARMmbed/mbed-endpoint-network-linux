@@ -40,9 +40,6 @@
  #define NSP_DOMAIN_LENGTH        			128
  #define NSP_DOMAIN              			"domain"
  
- // Minar Scheduling
- #define MCI_MINAR_SCHEDULER				true
- 
  // YOTTA
  #define MCI_USE_YOTTA                                  true
 
