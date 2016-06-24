@@ -74,8 +74,9 @@ void* wait_for_unregister(void* arg) {
 }
 
 void *update_registration(void* arg) {
+    sleep(30);
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
-    while(1) {
+    while(loop) {
         sleep(30);
         ep->re_register_endpoint();
     }
@@ -132,7 +133,7 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
 // setup shutdown button
 void net_setup_deregistration_button(void *p) {
     // set signal handler for ctrl-c
-    signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
+    //signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
 }
 
 // main()
