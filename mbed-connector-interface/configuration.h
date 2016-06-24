@@ -25,6 +25,9 @@
 
 /************* mbed-client CONFIGURATION DEFAULTS  ***********************/
 
+ // we will use ThreadedResourceObserver
+ #define CONNECTOR_USING_THREADS 			1
+
  // NSP node name
  #define NODE_NAME_LENGTH         			128
  #define NODE_NAME                			"mbed-endpoint"
