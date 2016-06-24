@@ -138,3 +138,5 @@ void net_setup_deregistration_button(void *p) {
 int main(int argc,char *argv[]) {
     app_start(argc,argv);	
 }
+
+}
