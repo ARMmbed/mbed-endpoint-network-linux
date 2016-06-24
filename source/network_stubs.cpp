@@ -44,7 +44,7 @@ typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 pthread_t unregister_thread;
 pthread_t observation_thread;
 pthread_t update_register_thread;
-extern volatile bool loop;
+volatile bool loop;
 
 extern "C" {
 
@@ -125,6 +125,9 @@ void net_begin_main_loop(Connector::Endpoint *endpoint)
     logger.log("mbedEndpointNetwork(Linux): Starting main loop...");
     pthread_create(&update_register_thread,NULL,&update_registration,(void *)endpoint);
     pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
+
+    // enter main loop
+    while(loop);
 }
 
 // setup shutdown button
