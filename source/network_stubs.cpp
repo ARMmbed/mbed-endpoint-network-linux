@@ -58,7 +58,7 @@ static void ctrl_c_handle_function(void)
 
 void wait_for_registration(Connector::Endpoint *ep) {
     while(ep->isRegistered() == false) {
-	sleep(1);
+	sleep(2);
     }
 }
 
@@ -127,12 +127,6 @@ void net_create_main_loop(Connector::Endpoint *endpoint)
 // begin the main loop for processing network events
 void net_begin_main_loop(Connector::Endpoint *endpoint)
 {
-    // Initialize our main loop...
-    logger.log("mbedEndpointNetwork(Linux): Setting CTRL-C handler...");
-
-    // set signal handler for ctrl-c
-    signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
-
     // enter main loop
     logger.log("mbedEndpointNetwork(Linux): endpoint starting main loop...");
     while(loop) {
@@ -157,6 +151,11 @@ void net_perform_endpoint_registration(Connector::Endpoint *endpoint)
 
 // setup shutdown button
 void net_setup_deregistration_button(void *p) {
+    // Initialize our main loop...
+    logger.log("mbedEndpointNetwork(Linux): Setting CTRL-C handler...");
+
+    // set signal handler for ctrl-c
+    signal(SIGINT,(signalhandler_t)ctrl_c_handle_function);
 }
 
 // main()
