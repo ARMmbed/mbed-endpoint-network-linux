@@ -37,8 +37,8 @@ extern void app_start(int argc,char *argv[]);
 
 extern "C" {
 
-pthread_t unregister_thread;
-pthread_t update_register_thread;
+pthread_t deregistration_thread;
+pthread_t registration_update_thread;
 
 // main loop
 volatile bool loop = true;
@@ -46,31 +46,35 @@ volatile bool loop = true;
 typedef void (*signalhandler_t)(int); /* Function pointer type for ctrl-c */
 
 // Linux Handlers
-static void ctrl_c_handle_function(void) {
-    if (_my_endpoint != NULL) {
+static void ctrl_c_handle_function(void) 
+{
+    if (_my_endpoint != NULL) 
+    {
         Connector::Endpoint *ep = (Connector::Endpoint *)_my_endpoint;
         ep->de_register_endpoint();
+        exit(1);
     }
-    exit(1);
 }
 
-// wait for deregistratino to occur
-void* wait_for_unregister(void* arg) {
+// wait for deregistration to occur
+void *wait_for_deregistration(void* arg) 
+{
      sleep(30);
      Connector::Endpoint *ep = (Connector::Endpoint *)arg;
      while(ep->isRegistered() == true) {
 	sleep(5);
      }
      logger.log("De-registration completed. Killing Threads...");
-     pthread_detach(update_register_thread);
-     pthread_detach(unregister_thread);
-     pthread_cancel(update_register_thread);
-     pthread_cancel(unregister_thread);
+     pthread_detach(registration_update_thread);
+     pthread_detach(deregistration_thread);
+     pthread_cancel(registration_update_thread);
+     pthread_cancel(deregistration_thread);
      loop = false; 
      return NULL;
 }
 
-void *update_registration(void* arg) {
+void *update_registration(void* arg) 
+{
     sleep(30);
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
     while(loop) {
@@ -81,7 +85,8 @@ void *update_registration(void* arg) {
 }
 
 
-void *register_endpoint(void *arg) {
+void *register_endpoint(void *arg) 
+{
     Connector::Endpoint *ep = (Connector::Endpoint *)arg;
     if (ep != NULL) {
 	logger.log("mbedEndpointNetwork(Linux): registering endpoint...");
@@ -113,11 +118,11 @@ void net_create_main_loop(Connector::Endpoint *endpoint)
 {
      // create the registration update thread...
      logger.log("mbedEndpointNetwork(Linux): endpoint creating re-registration thread...");
-     pthread_create(&update_register_thread,NULL,&update_registration,(void *)endpoint);
+     pthread_create(&registration_update_thread,NULL,&update_registration,(void *)endpoint);
 
      // create the unregistration thread...
      logger.log("mbedEndpointNetwork(Linux): endpoint creating de-registration thread...");
-     pthread_create(&unregister_thread,NULL,&wait_for_unregister,(void*)endpoint);
+     pthread_create(&deregistration_thread,NULL,&wait_for_deregistration,(void*)endpoint);
 }
 
 // begin the main loop for processing network events
