@@ -113,7 +113,7 @@ void net_perform_endpoint_registration(Connector::Endpoint *endpoint)
 }
 
 // create a suitable main event loop for this specific network
-void net_create_main_loop(Connector::Endpoint * /*endpoint */)
+void net_create_main_loop(Connector::Endpoint *endpoint)
 {
      // create the registration update thread...
      logger.log("mbedEndpointNetwork(Linux): endpoint creating re-registration thread...");
