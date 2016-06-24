@@ -141,10 +141,10 @@ void net_perform_endpoint_registration(Connector::Endpoint *endpoint)
     register_endpoint((void *)endpoint);
 
     // create the main loop
-    net_create_main_loop((void *)endpoint);
+    net_create_main_loop(endpoint);
 
     // start the main loop
-    net_begin_main_loop((void *)endpoint);
+    net_begin_main_loop(endpoint);
 }
 
 // setup shutdown button
